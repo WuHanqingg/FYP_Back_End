@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fyp.weathermonitor.mappers.UsersMapper">
+
+	<!--实体映射-->
+	<resultMap id="base_result_map" type="com.fyp.weathermonitor.entity.po.Users">
+		<!---->
+		<id column="id" property="id"  />
+		<!--登录用户名-->
+		<result column="username" property="username"  />
+		<!--bcrypt 哈希值-->
+		<result column="password_hash" property="passwordHash"  />
+		<!---->
+		<result column="full_name" property="fullName"  />
+		<!--用户角色-->
+		<result column="role" property="role"  />
+		<!---->
+		<result column="is_active" property="isActive"  />
+		<!---->
+		<result column="created_at" property="createdAt"  />
+		<!---->
+		<result column="updated_at" property="updatedAt"  />
+	</resultMap>
+
+
+	<!-- 通用查询结果列-->
+	<sql id="base_column_list">
+		 u.id,u.username,u.password_hash,u.full_name,u.role,
+		 u.is_active,u.created_at,u.updated_at
+	</sql>
+
+	<sql id="base_condition_filed">
+			<if test="query.id != null">
+				 and  u.id = #{query.id}
+			</if>
+			<if test="query.username != null and query.username!=''">
+				 and  u.username = #{query.username}
+			</if>
+			<if test="query.passwordHash != null and query.passwordHash!=''">
+				 and  u.password_hash = #{query.passwordHash}
+			</if>
+			<if test="query.fullName != null and query.fullName!=''">
+				 and  u.full_name = #{query.fullName}
+			</if>
+			<if test="query.role != null and query.role!=''">
+				 and  u.role = #{query.role}
+			</if>
+			<if test="query.isActive != null">
+				 and  u.is_active = #{query.isActive}
+			</if>
+			<if test="query.createdAt != null and query.createdAt!=''">
+				 <![CDATA[ and  u.created_at=str_to_date(#{query.createdAt}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.updatedAt != null and query.updatedAt!=''">
+				 <![CDATA[ and  u.updated_at=str_to_date(#{query.updatedAt}, '%Y-%m-%d') ]]>
+			</if>
+	</sql>
+	<!-- 通用条件列-->
+	<sql id="base_condition">
+	 <where>
+		 <include refid="base_condition_filed" />
+	 </where>
+	</sql>
+
+	<!-- 通用查询条件列-->
+	<sql id="query_condition">
+	 <where>
+			<include refid="base_condition_filed" />
+			<if test="query.usernameFuzzy!= null  and query.usernameFuzzy!=''">
+				 and  u.username like concat('%', #{query.usernameFuzzy}, '%')
+			</if>
+			<if test="query.passwordHashFuzzy!= null  and query.passwordHashFuzzy!=''">
+				 and  u.password_hash like concat('%', #{query.passwordHashFuzzy}, '%')
+			</if>
+			<if test="query.fullNameFuzzy!= null  and query.fullNameFuzzy!=''">
+				 and  u.full_name like concat('%', #{query.fullNameFuzzy}, '%')
+			</if>
+			<if test="query.roleFuzzy!= null  and query.roleFuzzy!=''">
+				 and  u.role like concat('%', #{query.roleFuzzy}, '%')
+			</if>
+			<if test="query.createdAtStart!= null and query.createdAtStart!=''">
+				 <![CDATA[ and  u.created_at>=str_to_date(#{query.createdAtStart}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.createdAtEnd!= null and query.createdAtEnd!=''">
+				 <![CDATA[ and  u.created_at< date_sub(str_to_date(#{query.createdAtEnd},'%Y-%m-%d'),interval -1 day) ]]>
+			</if>
+			<if test="query.updatedAtStart!= null and query.updatedAtStart!=''">
+				 <![CDATA[ and  u.updated_at>=str_to_date(#{query.updatedAtStart}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.updatedAtEnd!= null and query.updatedAtEnd!=''">
+				 <![CDATA[ and  u.updated_at< date_sub(str_to_date(#{query.updatedAtEnd},'%Y-%m-%d'),interval -1 day) ]]>
+			</if>
+	 </where>
+	</sql>
+
+	<!-- 查询集合-->
+	<select id="selectList" resultMap="base_result_map" >
+		 SELECT <include refid="base_column_list" /> FROM users u <include refid="query_condition" />
+		 <if test="query.orderBy!=null">
+			 order by ${query.orderBy}
+		 </if>
+		 <if test="query.simplePage!=null">
+			 limit #{query.simplePage.start},#{query.simplePage.end}
+		 </if>
+	</select>
+
+	<!-- 查询数量-->
+	<select id="selectCount" resultType="java.lang.Integer" >
+		 SELECT count(1) FROM users u <include refid="query_condition" />
+	</select>
+
+	<!-- 插入 （匹配有值的字段）-->
+	<insert id="insert" parameterType="com.fyp.weathermonitor.entity.po.Users">
+		<selectKey keyProperty="bean.id" resultType="Long" order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		 INSERT INTO users
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="bean.username != null">
+				 username,
+			</if>
+			<if test="bean.passwordHash != null">
+				 password_hash,
+			</if>
+			<if test="bean.fullName != null">
+				 full_name,
+			</if>
+			<if test="bean.role != null">
+				 role,
+			</if>
+			<if test="bean.isActive != null">
+				 is_active,
+			</if>
+			<if test="bean.createdAt != null">
+				 created_at,
+			</if>
+			<if test="bean.updatedAt != null">
+				 updated_at,
+			</if>
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="bean.username!=null">
+				 #{bean.username},
+			</if>
+			<if test="bean.passwordHash!=null">
+				 #{bean.passwordHash},
+			</if>
+			<if test="bean.fullName!=null">
+				 #{bean.fullName},
+			</if>
+			<if test="bean.role!=null">
+				 #{bean.role},
+			</if>
+			<if test="bean.isActive!=null">
+				 #{bean.isActive},
+			</if>
+			<if test="bean.createdAt!=null">
+				 #{bean.createdAt},
+			</if>
+			<if test="bean.updatedAt!=null">
+				 #{bean.updatedAt},
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 插入或者更新 （匹配有值的字段）-->
+	<insert id="insertOrUpdate" parameterType="com.fyp.weathermonitor.entity.po.Users">
+		 INSERT INTO users
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="bean.id != null">
+				 id,
+			</if>
+			<if test="bean.username != null">
+				 username,
+			</if>
+			<if test="bean.passwordHash != null">
+				 password_hash,
+			</if>
+			<if test="bean.fullName != null">
+				 full_name,
+			</if>
+			<if test="bean.role != null">
+				 role,
+			</if>
+			<if test="bean.isActive != null">
+				 is_active,
+			</if>
+			<if test="bean.createdAt != null">
+				 created_at,
+			</if>
+			<if test="bean.updatedAt != null">
+				 updated_at,
+			</if>
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="bean.id!=null">
+				 #{bean.id},
+			</if>
+			<if test="bean.username!=null">
+				 #{bean.username},
+			</if>
+			<if test="bean.passwordHash!=null">
+				 #{bean.passwordHash},
+			</if>
+			<if test="bean.fullName!=null">
+				 #{bean.fullName},
+			</if>
+			<if test="bean.role!=null">
+				 #{bean.role},
+			</if>
+			<if test="bean.isActive!=null">
+				 #{bean.isActive},
+			</if>
+			<if test="bean.createdAt!=null">
+				 #{bean.createdAt},
+			</if>
+			<if test="bean.updatedAt!=null">
+				 #{bean.updatedAt},
+			</if>
+		 </trim>
+		 on DUPLICATE key update 
+		 <trim prefix="" suffix="" suffixOverrides=",">
+			<if test="bean.username!=null">
+				 username = VALUES(username),
+			</if>
+			<if test="bean.passwordHash!=null">
+				 password_hash = VALUES(password_hash),
+			</if>
+			<if test="bean.fullName!=null">
+				 full_name = VALUES(full_name),
+			</if>
+			<if test="bean.role!=null">
+				 role = VALUES(role),
+			</if>
+			<if test="bean.isActive!=null">
+				 is_active = VALUES(is_active),
+			</if>
+			<if test="bean.createdAt!=null">
+				 created_at = VALUES(created_at),
+			</if>
+			<if test="bean.updatedAt!=null">
+				 updated_at = VALUES(updated_at),
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 添加 （批量插入）-->
+	<insert id="insertBatch" parameterType="com.fyp.weathermonitor.entity.po.Users" useGeneratedKeys="true" keyProperty="id">
+		 INSERT INTO users(
+			 username,
+			 password_hash,
+			 full_name,
+			 role,
+			 is_active,
+			 created_at,
+			 updated_at
+		 )values
+		 <foreach collection="list" item="item" separator=",">
+			 (
+				 #{item.username},
+				 #{item.passwordHash},
+				 #{item.fullName},
+				 #{item.role},
+				 #{item.isActive},
+				 #{item.createdAt},
+				 #{item.updatedAt}
+			 )
+		 </foreach>
+	</insert>
+
+	<!-- 批量新增修改 （批量插入）-->
+	<insert id="insertOrUpdateBatch" parameterType="com.fyp.weathermonitor.entity.po.Users">
+		 INSERT INTO users(
+			 username,
+			 password_hash,
+			 full_name,
+			 role,
+			 is_active,
+			 created_at,
+			 updated_at
+		 )values
+		 <foreach collection="list" item="item" separator=",">
+			 (
+				 #{item.username},
+				 #{item.passwordHash},
+				 #{item.fullName},
+				 #{item.role},
+				 #{item.isActive},
+				 #{item.createdAt},
+				 #{item.updatedAt}
+			 )
+		 </foreach>
+			on DUPLICATE key update 
+			username = VALUES(username),
+			password_hash = VALUES(password_hash),
+			full_name = VALUES(full_name),
+			role = VALUES(role),
+			is_active = VALUES(is_active),
+			created_at = VALUES(created_at),
+			updated_at = VALUES(updated_at)
+	</insert>
+
+	<!--多条件修改-->
+	<update id="updateByParam" parameterType="com.fyp.weathermonitor.entity.query.UsersQuery">
+		 UPDATE users u
+ 		 <set> 
+			<if test="bean.username != null">
+				 username = #{bean.username},
+			</if>
+			<if test="bean.passwordHash != null">
+				 password_hash = #{bean.passwordHash},
+			</if>
+			<if test="bean.fullName != null">
+				 full_name = #{bean.fullName},
+			</if>
+			<if test="bean.role != null">
+				 role = #{bean.role},
+			</if>
+			<if test="bean.isActive != null">
+				 is_active = #{bean.isActive},
+			</if>
+			<if test="bean.createdAt != null">
+				 created_at = #{bean.createdAt},
+			</if>
+			<if test="bean.updatedAt != null">
+				 updated_at = #{bean.updatedAt},
+			</if>
+ 		 </set>
+ 		 <include refid="query_condition" />
+	</update>
+
+	<!--多条件删除-->
+	<delete id="deleteByParam">
+		 delete u from users u
+ 		 <include refid="query_condition" />
+	</delete>
+
+	<!-- 根据Id修改-->
+	<update id="updateById" parameterType="com.fyp.weathermonitor.entity.po.Users">
+		 UPDATE users
+ 		 <set> 
+			<if test="bean.username != null">
+				 username = #{bean.username},
+			</if>
+			<if test="bean.passwordHash != null">
+				 password_hash = #{bean.passwordHash},
+			</if>
+			<if test="bean.fullName != null">
+				 full_name = #{bean.fullName},
+			</if>
+			<if test="bean.role != null">
+				 role = #{bean.role},
+			</if>
+			<if test="bean.isActive != null">
+				 is_active = #{bean.isActive},
+			</if>
+			<if test="bean.createdAt != null">
+				 created_at = #{bean.createdAt},
+			</if>
+			<if test="bean.updatedAt != null">
+				 updated_at = #{bean.updatedAt},
+			</if>
+ 		 </set>
+ 		 where id=#{id}
+	</update>
+
+	<!-- 根据Id删除-->
+	<delete id="deleteById">
+		delete from users where id=#{id}
+	</delete>
+
+	<!-- 根据PrimaryKey获取对象-->
+	<select id="selectById" resultMap="base_result_map" >
+		select <include refid="base_column_list" /> from users u where id=#{id}
+	</select>
+
+	<!-- 根据Username修改-->
+	<update id="updateByUsername" parameterType="com.fyp.weathermonitor.entity.po.Users">
+		 UPDATE users
+ 		 <set> 
+			<if test="bean.passwordHash != null">
+				 password_hash = #{bean.passwordHash},
+			</if>
+			<if test="bean.fullName != null">
+				 full_name = #{bean.fullName},
+			</if>
+			<if test="bean.role != null">
+				 role = #{bean.role},
+			</if>
+			<if test="bean.isActive != null">
+				 is_active = #{bean.isActive},
+			</if>
+			<if test="bean.createdAt != null">
+				 created_at = #{bean.createdAt},
+			</if>
+			<if test="bean.updatedAt != null">
+				 updated_at = #{bean.updatedAt},
+			</if>
+ 		 </set>
+ 		 where username=#{username}
+	</update>
+
+	<!-- 根据Username删除-->
+	<delete id="deleteByUsername">
+		delete from users where username=#{username}
+	</delete>
+
+	<!-- 根据PrimaryKey获取对象-->
+	<select id="selectByUsername" resultMap="base_result_map" >
+		select <include refid="base_column_list" /> from users u where username=#{username}
+	</select>
+
+</mapper>
