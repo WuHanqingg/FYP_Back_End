@@ -6,13 +6,13 @@ import java.io.Serializable;
 
 
 /**
- * 
+ *
  */
 public class Threshold implements Serializable {
 
 
 	/**
-	 * 
+	 *
 	 */
 	private Long id;
 
@@ -30,6 +30,11 @@ public class Threshold implements Serializable {
 	 * 阈值数值
 	 */
 	private BigDecimal value;
+
+	/**
+	 * 阈值单位
+	 */
+	private String unit;
 
 
 	public void setId(Long id){
@@ -64,8 +69,16 @@ public class Threshold implements Serializable {
 		return this.value;
 	}
 
+	public void setUnit(String unit){
+		this.unit = unit;
+	}
+
+	public String getUnit(){
+		return this.unit;
+	}
+
 	@Override
 	public String toString (){
-		return "id:"+(id == null ? "空" : id)+"，阈值名称:"+(name == null ? "空" : name)+"，阈值类型:"+(type == null ? "空" : type)+"，阈值数值:"+(value == null ? "空" : value);
+		return "id:"+(id == null ? "空" : id)+"，阈值名称:"+(name == null ? "空" : name)+"，阈值类型:"+(type == null ? "空" : type)+"，阈值数值:"+(value == null ? "空" : value)+"，阈值单位:"+(unit == null ? "空" : unit);
 	}
 }

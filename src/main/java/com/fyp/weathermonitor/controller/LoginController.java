@@ -34,7 +34,6 @@ public class LoginController extends ABaseController{
     @RequestMapping("/refreshToken")
     public ResponseVO refreshToken(HttpServletRequest request) {
         String refreshToken = request.getHeader("Authorization");
-        System.out.println(refreshToken);
         tokenVO token = TokenUtil.refreshToken(refreshToken);
         if(token == null){
             BusinessException exception = new BusinessException(ResponseCodeEnum.CODE_401);

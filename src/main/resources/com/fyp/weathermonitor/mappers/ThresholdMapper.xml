@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
-    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.fyp.weathermonitor.mappers.ThresholdMapper">
 
 	<!--实体映射-->
@@ -13,59 +13,68 @@
 		<result column="type" property="type"  />
 		<!--阈值数值-->
 		<result column="value" property="value"  />
+		<!--阈值单位-->
+		<result column="unit" property="unit"  />
 	</resultMap>
 
 
 	<!-- 通用查询结果列-->
 	<sql id="base_column_list">
-		 t.id,t.name,t.type,t.value
+		t.id,t.name,t.type,t.value,t.unit
+
 	</sql>
 
 	<sql id="base_condition_filed">
-			<if test="query.id != null">
-				 and  t.id = #{query.id}
-			</if>
-			<if test="query.name != null and query.name!=''">
-				 and  t.name = #{query.name}
-			</if>
-			<if test="query.type != null">
-				 and  t.type = #{query.type}
-			</if>
-			<if test="query.value != null">
-				 and  t.value = #{query.value}
-			</if>
+		<if test="query.id != null">
+			and  t.id = #{query.id}
+		</if>
+		<if test="query.name != null and query.name!=''">
+			and  t.name = #{query.name}
+		</if>
+		<if test="query.type != null">
+			and  t.type = #{query.type}
+		</if>
+		<if test="query.value != null">
+			and  t.value = #{query.value}
+		</if>
+		<if test="query.unit != null and query.unit!=''">
+			and  t.unit = #{query.unit}
+		</if>
 	</sql>
 	<!-- 通用条件列-->
 	<sql id="base_condition">
-	 <where>
-		 <include refid="base_condition_filed" />
-	 </where>
+		<where>
+			<include refid="base_condition_filed" />
+		</where>
 	</sql>
 
 	<!-- 通用查询条件列-->
 	<sql id="query_condition">
-	 <where>
+		<where>
 			<include refid="base_condition_filed" />
 			<if test="query.nameFuzzy!= null  and query.nameFuzzy!=''">
-				 and  t.name like concat('%', #{query.nameFuzzy}, '%')
+				and  t.name like concat('%', #{query.nameFuzzy}, '%')
 			</if>
-	 </where>
+			<if test="query.unitFuzzy!= null  and query.unitFuzzy!=''">
+				and  t.unit like concat('%', #{query.unitFuzzy}, '%')
+			</if>
+		</where>
 	</sql>
 
 	<!-- 查询集合-->
 	<select id="selectList" resultMap="base_result_map" >
-		 SELECT <include refid="base_column_list" /> FROM threshold t <include refid="query_condition" />
-		 <if test="query.orderBy!=null">
-			 order by ${query.orderBy}
-		 </if>
-		 <if test="query.simplePage!=null">
-			 limit #{query.simplePage.start},#{query.simplePage.end}
-		 </if>
+		SELECT <include refid="base_column_list" /> FROM threshold t <include refid="query_condition" />
+		<if test="query.orderBy!=null">
+			order by ${query.orderBy}
+		</if>
+		<if test="query.simplePage!=null">
+			limit #{query.simplePage.start},#{query.simplePage.end}
+		</if>
 	</select>
 
 	<!-- 查询数量-->
 	<select id="selectCount" resultType="java.lang.Integer" >
-		 SELECT count(1) FROM threshold t <include refid="query_condition" />
+		SELECT count(1) FROM threshold t <include refid="query_condition" />
 	</select>
 
 	<!-- 插入 （匹配有值的字段）-->
@@ -73,150 +82,176 @@
 		<selectKey keyProperty="bean.id" resultType="Long" order="AFTER">
 			SELECT LAST_INSERT_ID()
 		</selectKey>
-		 INSERT INTO threshold
-		 <trim prefix="(" suffix=")" suffixOverrides="," >
+		INSERT INTO threshold
+		<trim prefix="(" suffix=")" suffixOverrides="," >
 			<if test="bean.name != null">
-				 name,
+				name,
 			</if>
 			<if test="bean.type != null">
-				 type,
+				type,
 			</if>
 			<if test="bean.value != null">
-				 value,
+				value,
 			</if>
-		 </trim>
-		 <trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="bean.unit != null">
+				unit,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
 			<if test="bean.name!=null">
-				 #{bean.name},
+				#{bean.name},
 			</if>
 			<if test="bean.type!=null">
-				 #{bean.type},
+				#{bean.type},
 			</if>
 			<if test="bean.value!=null">
-				 #{bean.value},
+				#{bean.value},
 			</if>
-		 </trim>
+			<if test="bean.unit!=null">
+				#{bean.unit},
+			</if>
+		</trim>
 	</insert>
 
 	<!-- 插入或者更新 （匹配有值的字段）-->
 	<insert id="insertOrUpdate" parameterType="com.fyp.weathermonitor.entity.po.Threshold">
-		 INSERT INTO threshold
-		 <trim prefix="(" suffix=")" suffixOverrides=",">
+		INSERT INTO threshold
+		<trim prefix="(" suffix=")" suffixOverrides=",">
 			<if test="bean.id != null">
-				 id,
+				id,
 			</if>
 			<if test="bean.name != null">
-				 name,
+				name,
 			</if>
 			<if test="bean.type != null">
-				 type,
+				type,
 			</if>
 			<if test="bean.value != null">
-				 value,
+				value,
 			</if>
-		 </trim>
-		 <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="bean.unit != null">
+				unit,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="bean.id!=null">
-				 #{bean.id},
+				#{bean.id},
 			</if>
 			<if test="bean.name!=null">
-				 #{bean.name},
+				#{bean.name},
 			</if>
 			<if test="bean.type!=null">
-				 #{bean.type},
+				#{bean.type},
 			</if>
 			<if test="bean.value!=null">
-				 #{bean.value},
+				#{bean.value},
 			</if>
-		 </trim>
-		 on DUPLICATE key update 
-		 <trim prefix="" suffix="" suffixOverrides=",">
+			<if test="bean.unit!=null">
+				#{bean.unit},
+			</if>
+		</trim>
+		on DUPLICATE key update
+		<trim prefix="" suffix="" suffixOverrides=",">
 			<if test="bean.name!=null">
-				 name = VALUES(name),
+				name = VALUES(name),
 			</if>
 			<if test="bean.type!=null">
-				 type = VALUES(type),
+				type = VALUES(type),
 			</if>
 			<if test="bean.value!=null">
-				 value = VALUES(value),
+				value = VALUES(value),
 			</if>
-		 </trim>
+			<if test="bean.unit!=null">
+				unit = VALUES(unit),
+			</if>
+		</trim>
 	</insert>
 
 	<!-- 添加 （批量插入）-->
 	<insert id="insertBatch" parameterType="com.fyp.weathermonitor.entity.po.Threshold" useGeneratedKeys="true" keyProperty="id">
-		 INSERT INTO threshold(
-			 name,
-			 type,
-			 value
-		 )values
-		 <foreach collection="list" item="item" separator=",">
-			 (
-				 #{item.name},
-				 #{item.type},
-				 #{item.value}
-			 )
-		 </foreach>
+		INSERT INTO threshold(
+		name,
+		type,
+		value,
+		unit
+		)values
+		<foreach collection="list" item="item" separator=",">
+			(
+			#{item.name},
+			#{item.type},
+			#{item.value},
+			#{item.unit}
+			)
+		</foreach>
 	</insert>
 
 	<!-- 批量新增修改 （批量插入）-->
 	<insert id="insertOrUpdateBatch" parameterType="com.fyp.weathermonitor.entity.po.Threshold">
-		 INSERT INTO threshold(
-			 name,
-			 type,
-			 value
-		 )values
-		 <foreach collection="list" item="item" separator=",">
-			 (
-				 #{item.name},
-				 #{item.type},
-				 #{item.value}
-			 )
-		 </foreach>
-			on DUPLICATE key update 
-			name = VALUES(name),
-			type = VALUES(type),
-			value = VALUES(value)
+		INSERT INTO threshold(
+		name,
+		type,
+		value,
+		unit
+		)values
+		<foreach collection="list" item="item" separator=",">
+			(
+			#{item.name},
+			#{item.type},
+			#{item.value},
+			#{item.unit}
+			)
+		</foreach>
+		on DUPLICATE key update
+		name = VALUES(name),
+		type = VALUES(type),
+		value = VALUES(value),
+		unit = VALUES(unit)
 	</insert>
 
 	<!--多条件修改-->
 	<update id="updateByParam" parameterType="com.fyp.weathermonitor.entity.query.ThresholdQuery">
-		 UPDATE threshold t
- 		 <set> 
+		UPDATE threshold t
+		<set>
 			<if test="bean.name != null">
-				 name = #{bean.name},
+				name = #{bean.name},
 			</if>
 			<if test="bean.type != null">
-				 type = #{bean.type},
+				type = #{bean.type},
 			</if>
 			<if test="bean.value != null">
-				 value = #{bean.value},
+				value = #{bean.value},
 			</if>
- 		 </set>
- 		 <include refid="query_condition" />
+			<if test="bean.unit != null">
+				unit = #{bean.unit},
+			</if>
+		</set>
+		<include refid="query_condition" />
 	</update>
 
 	<!--多条件删除-->
 	<delete id="deleteByParam">
-		 delete t from threshold t
- 		 <include refid="query_condition" />
+		delete t from threshold t
+		<include refid="query_condition" />
 	</delete>
 
 	<!-- 根据Id修改-->
 	<update id="updateById" parameterType="com.fyp.weathermonitor.entity.po.Threshold">
-		 UPDATE threshold
- 		 <set> 
+		UPDATE threshold
+		<set>
 			<if test="bean.name != null">
-				 name = #{bean.name},
+				name = #{bean.name},
 			</if>
 			<if test="bean.type != null">
-				 type = #{bean.type},
+				type = #{bean.type},
 			</if>
 			<if test="bean.value != null">
-				 value = #{bean.value},
+				value = #{bean.value},
 			</if>
- 		 </set>
- 		 where id=#{id}
+			<if test="bean.unit != null">
+				unit = #{bean.unit},
+			</if>
+		</set>
+		where id=#{id}
 	</update>
 
 	<!-- 根据Id删除-->
@@ -231,13 +266,16 @@
 
 	<!-- 根据NameAndType修改-->
 	<update id="updateByNameAndType" parameterType="com.fyp.weathermonitor.entity.po.Threshold">
-		 UPDATE threshold
- 		 <set> 
+		UPDATE threshold
+		<set>
 			<if test="bean.value != null">
-				 value = #{bean.value},
+				value = #{bean.value},
 			</if>
- 		 </set>
- 		 where name=#{name} and type=#{type}
+			<if test="bean.unit != null">
+				unit = #{bean.unit},
+			</if>
+		</set>
+		where name=#{name} and type=#{type}
 	</update>
 
 	<!-- 根据NameAndType删除-->

@@ -2,15 +2,22 @@ package com.fyp.weathermonitor.controller;
 
 import java.util.List;
 
+import com.auth0.jwt.JWT;
+import com.fyp.weathermonitor.entity.enums.ResponseCodeEnum;
+import com.fyp.weathermonitor.entity.po.Users;
 import com.fyp.weathermonitor.entity.query.ThresholdQuery;
 import com.fyp.weathermonitor.entity.po.Threshold;
 import com.fyp.weathermonitor.entity.vo.ResponseVO;
+import com.fyp.weathermonitor.exception.BusinessException;
 import com.fyp.weathermonitor.service.ThresholdService;
+import com.fyp.weathermonitor.service.UsersService;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  *  Controller
@@ -21,6 +28,9 @@ public class ThresholdController extends ABaseController{
 
 	@Resource
 	private ThresholdService thresholdService;
+
+	@Resource
+	private UsersService usersService;
 	/**
 	 * 根据条件分页查询
 	 */
@@ -68,8 +78,14 @@ public class ThresholdController extends ABaseController{
 	 * 根据Id修改对象
 	 */
 	@RequestMapping("/updateThresholdById")
-	public ResponseVO updateThresholdById(Threshold bean,Long id) {
-		thresholdService.updateThresholdById(bean,id);
+	public ResponseVO updateThresholdById(@RequestBody Threshold bean,Long id, HttpServletRequest request) {
+		String token = request.getHeader("Authorization").substring(7);
+		String username = JWT.decode(token).getClaim("username").asString();
+		Users userDb = usersService.getUsersByUsername(username);
+		String userRole = userDb.getRole();
+		if (!userRole.equals("admin"))
+			return getBusinessErrorResponseVO(new BusinessException(ResponseCodeEnum.CODE_401),"Not Authorized");
+		thresholdService.updateThresholdById(bean,bean.getId());
 		return getSuccessResponseVO(null);
 	}
 

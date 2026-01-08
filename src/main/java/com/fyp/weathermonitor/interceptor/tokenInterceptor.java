@@ -21,7 +21,6 @@ public class tokenInterceptor implements HandlerInterceptor {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
             return false;
         }
-        System.out.println("拦截token请求");
         return true;
     }
 }

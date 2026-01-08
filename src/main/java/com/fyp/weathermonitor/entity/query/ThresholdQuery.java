@@ -10,7 +10,7 @@ public class ThresholdQuery extends BaseParam {
 
 
 	/**
-	 * 
+	 *
 	 */
 	private Long id;
 
@@ -30,6 +30,13 @@ public class ThresholdQuery extends BaseParam {
 	 * 阈值数值
 	 */
 	private BigDecimal value;
+
+	/**
+	 * 阈值单位
+	 */
+	private String unit;
+
+	private String unitFuzzy;
 
 
 	public void setId(Long id){
@@ -70,6 +77,22 @@ public class ThresholdQuery extends BaseParam {
 
 	public BigDecimal getValue(){
 		return this.value;
+	}
+
+	public void setUnit(String unit){
+		this.unit = unit;
+	}
+
+	public String getUnit(){
+		return this.unit;
+	}
+
+	public void setUnitFuzzy(String unitFuzzy){
+		this.unitFuzzy = unitFuzzy;
+	}
+
+	public String getUnitFuzzy(){
+		return this.unitFuzzy;
 	}
 
 }
