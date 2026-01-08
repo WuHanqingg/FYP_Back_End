@@ -3,6 +3,8 @@ package com.fyp.weathermonitor.entity.enums;
 
 public enum ResponseCodeEnum {
     CODE_200(200, "请求成功"),
+    CODE_401(401, "未认证"),
+    CODE_403(403, "未授权"),
     CODE_404(404, "请求地址不存在"),
     CODE_600(600, "请求参数错误"),
     CODE_601(601, "信息已经存在"),
