@@ -2,13 +2,12 @@ package com.fyp.weathermonitor.controller;
 
 import java.util.List;
 
+import com.fyp.weathermonitor.entity.Constants;
 import com.fyp.weathermonitor.entity.query.UsersQuery;
 import com.fyp.weathermonitor.entity.po.Users;
 import com.fyp.weathermonitor.entity.vo.ResponseVO;
 import com.fyp.weathermonitor.service.UsersService;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -33,7 +32,8 @@ public class UsersController extends ABaseController{
 	 * 新增
 	 */
 	@RequestMapping("/add")
-	public ResponseVO add(Users bean) {
+	public ResponseVO add(@RequestBody Users bean) {
+		bean.setPasswordHash(Constants.DEFAULT_PASSWORD);
 		usersService.add(bean);
 		return getSuccessResponseVO(null);
 	}
@@ -68,8 +68,8 @@ public class UsersController extends ABaseController{
 	 * 根据Id修改对象
 	 */
 	@RequestMapping("/updateUsersById")
-	public ResponseVO updateUsersById(Users bean,Long id) {
-		usersService.updateUsersById(bean,id);
+	public ResponseVO updateUsersById(@RequestBody Users bean,Long id) {
+		usersService.updateUsersById(bean, bean.getId());
 		return getSuccessResponseVO(null);
 	}
 

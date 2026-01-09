@@ -1,5 +1,6 @@
 package com.fyp.weathermonitor.interceptor;
 
+import com.auth0.jwt.JWT;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
